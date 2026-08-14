@@ -24,12 +24,12 @@
 需要先安装 DeepSeek Harness CLI。发布到独立 GitHub 仓库后，可以直接从 Git 安装：
 
 ```sh
-dsh plugin --profile web add github:kingOfSoySauce/dsh-liang-skin#COMMIT
+dsh plugin --profile web add 'github:kingOfSoySauce/dsh-liang-skin#v0.1.0'
 dsh --profile web --dump-config
 dsh --profile web
 ```
 
-请将 `COMMIT` 换成具体 commit。固定 commit 可避免之后的推送在未经审查时改变已安装代码。
+版本号固定为已验证的 release tag，之后推送到 `main` 的改动不会静默改变已安装代码。
 
 也可以克隆后从本地路径安装：
 
