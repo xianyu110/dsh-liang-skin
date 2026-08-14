@@ -96,6 +96,9 @@ npm run build
 
 修改 client 源码后需要运行 `npm run build`，并一起提交更新后的 `lib/client.js` 和 source map。
 
-## 素材
+## 灵感与素材来源
 
-插件包含运行时所需的图片和视频素材，安装后不需要额外下载。0–30 强度轴当前接入 24 张经过审核的人像锚点，滑动时直接切换最近锚点，不做图片交叉渐变。
+本插件的“滑动变祖”视觉概念、人物图片与插帧视频素材源自
+[Lichtspektrum/liang-intensity-calibrator](https://github.com/Lichtspektrum/liang-intensity-calibrator)。插件在原项目 0–30 强度轴的基础上，将视觉变化接入 DeepSeek Harness 的推理等级选择。
+
+运行时素材已包含在插件中，安装后不需要额外下载。当前接入 24 张经过审核的人像锚点，滑动时直接切换最近锚点，不做图片交叉渐变。
