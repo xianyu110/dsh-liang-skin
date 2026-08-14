@@ -29,12 +29,28 @@ const PREFERENCE_KEY = "dsh-liang-intensity-skin.enabled";
 
 const PORTRAIT_ANCHORS = [
   { level: 0, file: "stage-00.png" },
+  { level: 1, file: "level-01.png" },
+  { level: 3, file: "level-03.png" },
+  { level: 4, file: "level-04.png" },
   { level: 6, file: "stage-06.png" },
+  { level: 7, file: "level-07.png" },
+  { level: 9, file: "level-09.png" },
+  { level: 10, file: "level-10.png" },
   { level: 12, file: "stage-12.png" },
+  { level: 13, file: "level-13.png" },
+  { level: 14, file: "level-14.png" },
   { level: 15, file: "bridge-15.png" },
+  { level: 16, file: "level-16.png" },
+  { level: 17, file: "level-17.png" },
   { level: 18, file: "stage-18.png" },
+  { level: 19, file: "level-19.png" },
+  { level: 21, file: "level-21.png" },
+  { level: 22, file: "level-22.png" },
   { level: 24, file: "stage-24.png" },
+  { level: 25, file: "level-25.png" },
   { level: 27, file: "bridge-27.png" },
+  { level: 28, file: "level-28.png" },
+  { level: 29, file: "level-29.png" },
   { level: 30, file: "stage-30.png" },
 ] as const;
 
@@ -347,7 +363,7 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
 
   const previewIndex = nearestEffortIndex(frame, efforts);
   const previewEffort = efforts[previewIndex];
-  const progress = `${(frame / PREVIEW_MAX_FRAME) * 100}%`;
+  const progressRatio = frame / PREVIEW_MAX_FRAME;
 
   const commit = async (rawFrame: number) => {
     const targetIndex = nearestEffortIndex(rawFrame, efforts);
@@ -383,7 +399,7 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
       {interacting && (
         <output
           className="liang-effort-control__tooltip"
-          style={{ "--liang-tooltip-position": progress } as React.CSSProperties}
+          style={{ "--liang-slider-ratio": progressRatio } as React.CSSProperties}
         >
           {indicatorLabel(frame, efforts)}
         </output>
@@ -407,7 +423,6 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
         disabled={pending || state.status === "selecting"}
         aria-label="思考等级"
         aria-valuetext={previewEffort?.name ?? ""}
-        style={{ "--liang-slider-progress": progress } as React.CSSProperties}
         onPointerDown={() => {
           dragging.current = true;
           setInteracting(true);

@@ -267,16 +267,6 @@ body[data-liang-skin="on"]:is(
 }
 
 body[data-liang-skin="on"] .liang-effort-control {
-  --liang-control-accent: var(--liang-accent);
-  --liang-control-rail: color-mix(in srgb, var(--liang-accent) 34%, transparent);
-}
-
-body[data-liang-skin="on"]:is(
-  [data-liang-stage="0"],
-  [data-liang-stage="1"],
-  [data-liang-stage="2"],
-  [data-liang-stage="3"]
-) .liang-effort-control {
   --liang-control-accent: var(--liang-secondary);
   --liang-control-rail: color-mix(in srgb, var(--liang-secondary) 28%, transparent);
 }
@@ -288,11 +278,22 @@ body[data-liang-skin="on"]:is(
   pointer-events: none;
 }
 
+.liang-effort-control__ticks::before {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  content: "";
+  background: var(--liang-control-rail);
+  transform: translateY(-50%);
+}
+
 .liang-effort-control__tooltip {
   position: absolute;
   z-index: 4;
   bottom: calc(100% + 7px);
-  left: var(--liang-tooltip-position);
+  left: calc(10px + (100% - 20px) * var(--liang-slider-ratio));
   min-width: max-content;
   padding: 5px 8px;
   border: 1px solid var(--liang-border, rgb(0 0 0 / 12%));
@@ -333,9 +334,9 @@ body[data-liang-skin="on"]:is(
 .liang-effort-control__range {
   position: relative;
   z-index: 1;
-  width: 100%;
+  width: calc(100% - 7px);
   height: 28px;
-  margin: 0;
+  margin: 0 3.5px;
   cursor: ew-resize;
   appearance: none;
   background: transparent;
@@ -350,7 +351,7 @@ body[data-liang-skin="on"]:is(
 .liang-effort-control__range::-webkit-slider-runnable-track {
   height: 1px;
   border-radius: 1px;
-  background: linear-gradient(90deg, var(--liang-control-accent) 0 var(--liang-slider-progress), var(--liang-control-rail) var(--liang-slider-progress) 100%);
+  background: transparent;
 }
 
 .liang-effort-control__range::-webkit-slider-thumb {
@@ -374,12 +375,12 @@ body[data-liang-skin="on"] .liang-effort-control__range::-webkit-slider-thumb {
 
 .liang-effort-control__range::-moz-range-track {
   height: 1px;
-  background: var(--liang-control-rail);
+  background: transparent;
 }
 
 .liang-effort-control__range::-moz-range-progress {
   height: 1px;
-  background: var(--liang-control-accent);
+  background: transparent;
 }
 
 .liang-effort-control__range::-moz-range-thumb {

@@ -2,6 +2,14 @@
 
 把 Harness 的推理等级改为紧凑滑块，并用滑动变祖原项目的 0–30 强度映射同步人物、背景与界面配色。
 
+## 效果预览
+
+![滑动变祖皮肤效果](docs/preview.png)
+
+拖动推理等级滑块时，人物形态与界面配色会同步变化：
+
+![滑动变祖交互演示](docs/demo.gif)
+
 ## 交互规则
 
 - 档位直接读取当前模型的 `reasoning.efforts`，不写死数量或名称。
@@ -24,7 +32,7 @@
 需要先安装 DeepSeek Harness CLI。发布到独立 GitHub 仓库后，可以直接从 Git 安装：
 
 ```sh
-dsh plugin --profile web add 'github:kingOfSoySauce/dsh-liang-skin#v0.1.0'
+dsh plugin --profile web add 'github:kingOfSoySauce/dsh-liang-skin#v0.1.1'
 dsh --profile web --dump-config
 dsh --profile web
 ```
@@ -73,4 +81,4 @@ npm run build
 
 ## 素材
 
-插件包含运行时所需的图片和视频素材，安装后不需要额外下载。
+插件包含运行时所需的图片和视频素材，安装后不需要额外下载。0–30 强度轴当前接入 24 张经过审核的人像锚点，滑动时直接切换最近锚点，不做图片交叉渐变。

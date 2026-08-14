@@ -27,10 +27,12 @@ final result: passed
 - Tooltip may extend beyond the slider box at either endpoint so its center remains aligned with the thumb
 - Tooltip now follows the active skin surface: light surface with dark text in the light shell, dark surface with light text in the dark shell
 - Light mode retains Harness blue accents and a black badge with light lettering
-- Dark mode uses the calibrator's `#c19a49` / `#d5b56e` gold for the badge, hero glow, effort label, slider, and send action
-- Slider thumb, rail, and ticks use one subdued accent family; the send arrow is dark on gold
+- Dark mode uses the calibrator's `#c19a49` / `#d5b56e` gold for the badge, hero glow, effort label, and send action
+- Slider thumb, rail, and ticks always use the subdued secondary text color; the send arrow is dark on gold
 - Light mode slider, rail, and ticks use the secondary text color; the send arrow remains white on blue
 - Portraits render without brightness, contrast, or saturation filters; source artwork supplies the intended tonal grade
+- All 24 approved portrait anchors are registered by the host and selected by the client; no image crossfade is used
+- The custom rail starts and ends at the endpoint ticks, producing terminal T caps instead of crossing past them
 - Side-by-side reference comparison: `design-qa-comparison.png`
 - Final implementation capture: `design-qa-final.png`
 
