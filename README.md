@@ -1,14 +1,29 @@
 # 滑动变祖 · DeepSeek Harness 皮肤
 
+复制给你的 DSH，一键安装：
+
+```text
+帮我安装这个仓库的皮肤到我的 DSH，地址：https://github.com/kingOfSoySauce/dsh-liang-skin
+```
+
+## 效果展示
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="docs/preview.png" alt="滑动变祖皮肤效果截图" width="100%">
+      <br>
+      <sub>完整皮肤效果</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="docs/demo.gif" alt="滑动变祖交互演示" width="100%">
+      <br>
+      <sub>推理等级滑块演示</sub>
+    </td>
+  </tr>
+</table>
+
 把 Harness 的推理等级改为紧凑滑块，并用滑动变祖原项目的 0–30 强度映射同步人物、背景与界面配色。
-
-## 效果预览
-
-![滑动变祖皮肤效果](docs/preview.png)
-
-拖动推理等级滑块时，人物形态与界面配色会同步变化：
-
-![滑动变祖交互演示](docs/demo.gif)
 
 ## 交互规则
 
@@ -29,13 +44,15 @@
 
 ## 安装
 
-需要先安装 DeepSeek Harness CLI。发布到独立 GitHub 仓库后，可以直接从 Git 安装：
+需要先安装 DeepSeek Harness CLI；当前版本已在 `0.1.0-rc.6` 上验证。可以直接从 Git 安装：
 
 ```sh
 dsh plugin --profile web add 'github:kingOfSoySauce/dsh-liang-skin#v0.1.1'
 dsh --profile web --dump-config
 dsh --profile web
 ```
+
+如果正式 DSH 已经在运行，安装后需要先停止旧进程，再重新启动。
 
 版本号固定为已验证的 release tag，之后推送到 `main` 的改动不会静默改变已安装代码。
 
@@ -64,7 +81,7 @@ npm pack
 将生成的 `.tgz` 上传为 GitHub Release 附件后，用户下载并安装：
 
 ```sh
-dsh plugin --profile web add ./dsh-client-liang-intensity-skin-0.1.0.tgz
+dsh plugin --profile web add ./dsh-client-liang-intensity-skin-0.1.1.tgz
 ```
 
 包内已包含构建好的 `lib/client.js`，安装时不需要执行第三方 `prepare` 脚本。
