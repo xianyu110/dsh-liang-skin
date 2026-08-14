@@ -1,0 +1,472 @@
+.liang-skin-backdrop {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--liang-page, transparent);
+  opacity: 0;
+  transition: opacity 220ms ease, background-color 180ms linear;
+}
+
+body[data-liang-skin="on"] .liang-skin-backdrop {
+  opacity: 1;
+}
+
+.liang-skin-backdrop video,
+.liang-skin-backdrop img {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  display: block;
+  width: min(42vw, 720px);
+  height: 100vh;
+  object-fit: cover;
+  object-position: 50% 42%;
+  opacity: var(--liang-portrait-opacity, 0.45);
+  transform: translateY(-50%);
+  filter: none;
+  mask-image: linear-gradient(90deg, transparent 0%, rgb(0 0 0 / 20%) 10%, black 30%, black 100%);
+  transition: filter 180ms linear;
+}
+
+.liang-skin-backdrop img {
+  display: none;
+}
+
+.liang-skin-backdrop[data-media="sequence"] video,
+.liang-skin-backdrop[data-media="sequence"] .liang-skin-poster {
+  display: none;
+}
+
+.liang-skin-backdrop[data-media="sequence"] .liang-skin-sequence-frame {
+  display: block;
+  opacity: var(--liang-portrait-opacity, 0.82);
+}
+
+.liang-skin-backdrop[data-media="video"] .liang-skin-sequence-frame,
+.liang-skin-backdrop[data-media="video"] .liang-skin-poster {
+  display: none;
+}
+
+.liang-skin-backdrop[data-media="poster"] video,
+.liang-skin-backdrop[data-media="poster"] .liang-skin-sequence-frame {
+  display: none;
+}
+
+.liang-skin-backdrop[data-media="poster"] .liang-skin-poster {
+  display: block;
+}
+
+.liang-skin-backdrop[data-media="color"] video,
+.liang-skin-backdrop[data-media="color"] img {
+  display: none;
+}
+
+.liang-skin-backdrop::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(90deg, var(--liang-page, transparent) 0 28%, transparent 57% 100%);
+}
+
+body[data-liang-skin="on"] {
+  --dsw-alias-bg-base: var(--liang-bg-base) !important;
+  --dsw-alias-bg-layer-1: var(--liang-layer-1) !important;
+  --dsw-alias-bg-layer-2: var(--liang-layer-2) !important;
+  --dsw-alias-bg-layer-3: var(--liang-layer-3) !important;
+  --dsw-specific-sidebar-fill: var(--liang-sidebar) !important;
+  --dsw-alias-label-primary: var(--liang-ink) !important;
+  --dsw-alias-label-primary-dimmed: var(--liang-ink) !important;
+  --dsw-alias-label-secondary: var(--liang-secondary) !important;
+  --dsw-alias-label-tertiary: var(--liang-tertiary) !important;
+  --dsw-alias-label-caption: var(--liang-tertiary) !important;
+  --dsw-alias-border-l1: var(--liang-border) !important;
+  --dsw-alias-border-l2-darkmode-thin: var(--liang-border) !important;
+  --dsw-alias-border-l2: var(--liang-border) !important;
+  --dsw-alias-border-l3: var(--liang-border) !important;
+  --dsw-alias-button-primary-fill: var(--liang-accent) !important;
+  --dsw-alias-button-primary-hover: var(--liang-accent-hover) !important;
+  --dsw-alias-button-info-fill: var(--liang-accent) !important;
+  --dsw-alias-button-info-hover: var(--liang-accent-hover) !important;
+  --dsw-alias-state-business-primary: var(--liang-accent) !important;
+  --dsw-alias-interactive-bg-hover: var(--liang-hover) !important;
+  --dsw-alias-interactive-bg-active: var(--liang-hover) !important;
+  --dsw-alias-button-elevated-fill: var(--liang-layer-1) !important;
+  --dsw-alias-button-floating-fill: var(--liang-layer-2) !important;
+  --dsw-alias-button-floating-hover: var(--liang-layer-3) !important;
+  --dsw-alias-interactive-bg-hover-solid: var(--liang-layer-2) !important;
+  --dsw-specific-bubble: var(--liang-layer-2) !important;
+  --dsw-specific-input-major: var(--liang-layer-1) !important;
+  --dsw-specific-menu: var(--liang-layer-3) !important;
+  --dsw-specific-selector: var(--liang-layer-2) !important;
+  background: var(--liang-page) !important;
+}
+
+body[data-liang-skin="on"]:is(
+  [data-liang-stage="0"],
+  [data-liang-stage="1"],
+  [data-liang-stage="2"],
+  [data-liang-stage="3"]
+) {
+  --dsw-alias-brand-primary-new-colorprimary-new-color: rgb(65 118 230) !important;
+  --dsw-alias-brand-primary: rgb(15 17 21) !important;
+  --dsw-alias-brand-text: rgb(15 17 21) !important;
+  --dsw-alias-button-primary-fill: rgb(15 17 21) !important;
+  --dsw-alias-button-primary-hover: rgb(53 54 56) !important;
+  --dsw-alias-button-info-fill: rgb(65 118 230) !important;
+  --dsw-alias-button-info-hover: rgb(103 158 254) !important;
+  --dsw-alias-state-business-primary: rgb(65 118 230) !important;
+  --dsw-alias-label-primary-inverted: rgb(249 250 251) !important;
+  --dsw-alias-button-elevated-fill: rgb(255 255 255) !important;
+  --dsw-alias-button-floating-fill: rgb(255 255 255) !important;
+  --dsw-alias-button-floating-hover: rgb(241 243 245) !important;
+  --dsw-alias-interactive-bg-hover-solid: rgb(241 243 245) !important;
+  --dsw-specific-bubble: rgb(237 243 254) !important;
+  --dsw-specific-input-major: rgb(255 255 255) !important;
+  --dsw-specific-menu: rgb(255 255 255) !important;
+  --dsw-specific-selector: rgb(245 246 247) !important;
+}
+
+body[data-liang-skin="on"][data-liang-stage="5"] {
+  --dsw-alias-brand-primary-new-colorprimary-new-color: #c19a49 !important;
+  --dsw-alias-brand-primary: #c19a49 !important;
+  --dsw-alias-brand-text: #d5b56e !important;
+  --dsw-alias-button-info-fill: #c19a49 !important;
+  --dsw-alias-button-info-hover: #d5b56e !important;
+  --dsw-alias-state-business-primary: #c19a49 !important;
+}
+
+/* Preserve the wordmark badge contrast even when the underlying Harness
+   preference is dark while our low-intensity shell is light. */
+body[data-liang-skin="on"]:is(
+  [data-liang-stage="0"],
+  [data-liang-stage="1"],
+  [data-liang-stage="2"],
+  [data-liang-stage="3"]
+) button[aria-label="新建会话"] svg[viewBox="0 0 182 24"] > rect[width="52"] {
+  fill: rgb(15 17 21) !important;
+}
+
+body[data-liang-skin="on"]:is(
+  [data-liang-stage="0"],
+  [data-liang-stage="1"],
+  [data-liang-stage="2"],
+  [data-liang-stage="3"]
+) button[aria-label="新建会话"] svg[viewBox="0 0 182 24"] > g[clip-path*="badge"] path {
+  fill: rgb(249 250 251) !important;
+}
+
+body[data-liang-skin="on"][data-liang-stage="5"] button[aria-label="新建会话"] svg[viewBox="0 0 182 24"] > rect[width="52"] {
+  fill: #c19a49 !important;
+}
+
+body[data-liang-skin="on"][data-liang-stage="5"] button[aria-label="新建会话"] svg[viewBox="0 0 182 24"] > g[clip-path*="badge"] path {
+  fill: #171816 !important;
+}
+
+body[data-liang-skin="on"][data-liang-stage="5"] [aria-label^="选择模型"] > span:nth-of-type(2) {
+  color: #d5b56e !important;
+}
+
+body[data-liang-skin="on"][data-liang-stage="5"] [class*="heroGlow"] ellipse {
+  fill: #c19a49 !important;
+  fill-opacity: 0.16 !important;
+}
+
+body[data-liang-skin="on"][data-liang-stage="5"] span[class*="_previewBadge"] {
+  color: #171816 !important;
+  background: #c19a49 !important;
+}
+
+body[data-liang-skin="on"][data-liang-stage="5"] button[aria-label="发送消息"] {
+  color: #171816 !important;
+}
+
+body[data-liang-skin="on"][data-liang-stage="5"] button[aria-label="发送消息"]:disabled {
+  opacity: 0.62;
+}
+
+body[data-liang-skin="on"]:is(
+  [data-liang-stage="0"],
+  [data-liang-stage="1"],
+  [data-liang-stage="2"],
+  [data-liang-stage="3"]
+) button[aria-label="发送消息"] {
+  color: #fff !important;
+}
+
+body[data-liang-skin="on"]:is(
+  [data-liang-stage="0"],
+  [data-liang-stage="1"],
+  [data-liang-stage="2"],
+  [data-liang-stage="3"]
+) button[aria-label="发送消息"]:disabled {
+  color: rgb(255 255 255 / 92%) !important;
+  background: rgb(65 118 230 / 42%) !important;
+  opacity: 1;
+}
+
+body[data-liang-skin="on"] > #root {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+}
+
+body[data-liang-skin="on"] button,
+body[data-liang-skin="on"] input,
+body[data-liang-skin="on"] textarea {
+  transition: color 160ms linear, background-color 160ms linear, border-color 160ms linear;
+}
+
+/* Harness can itself be in dark mode while the low intensity stages are light.
+   The composer card has a native theme-mode fill, so explicitly bring only
+   those light stages back to the original light surface and readable ink. */
+body[data-liang-skin="on"]:is(
+  [data-liang-stage="0"],
+  [data-liang-stage="1"],
+  [data-liang-stage="2"],
+  [data-liang-stage="3"]
+) [data-composer-card="true"] {
+  border-color: var(--liang-border) !important;
+  color: var(--liang-ink) !important;
+  background: var(--liang-layer-1) !important;
+  box-shadow: 0 8px 28px rgb(20 22 20 / 8%);
+}
+
+body[data-liang-skin="on"]:is(
+  [data-liang-stage="0"],
+  [data-liang-stage="1"],
+  [data-liang-stage="2"],
+  [data-liang-stage="3"]
+) [data-composer-card="true"] :is(textarea, button, [data-input-mirror="true"]) {
+  color: var(--liang-ink) !important;
+  caret-color: var(--liang-accent) !important;
+}
+
+body[data-liang-skin="on"]:is(
+  [data-liang-stage="0"],
+  [data-liang-stage="1"],
+  [data-liang-stage="2"],
+  [data-liang-stage="3"]
+) [data-composer-card="true"] textarea::placeholder {
+  color: var(--liang-tertiary) !important;
+  opacity: 1;
+}
+
+.liang-effort-control {
+  --liang-control-accent: var(--dsw-alias-brand-primary-new-colorprimary-new-color, #4176e6);
+  --liang-control-rail: var(--dsw-alias-border-l3, rgb(0 0 0 / 16%));
+  position: relative;
+  display: flex;
+  width: 124px;
+  height: 28px;
+  align-items: center;
+  margin: 0 3px;
+  overflow: visible;
+}
+
+body[data-liang-skin="on"] .liang-effort-control {
+  --liang-control-accent: var(--liang-accent);
+  --liang-control-rail: color-mix(in srgb, var(--liang-accent) 34%, transparent);
+}
+
+body[data-liang-skin="on"]:is(
+  [data-liang-stage="0"],
+  [data-liang-stage="1"],
+  [data-liang-stage="2"],
+  [data-liang-stage="3"]
+) .liang-effort-control {
+  --liang-control-accent: var(--liang-secondary);
+  --liang-control-rail: color-mix(in srgb, var(--liang-secondary) 28%, transparent);
+}
+
+.liang-effort-control__ticks {
+  position: absolute;
+  z-index: 0;
+  inset: 0 10px;
+  pointer-events: none;
+}
+
+.liang-effort-control__tooltip {
+  position: absolute;
+  z-index: 4;
+  bottom: calc(100% + 7px);
+  left: var(--liang-tooltip-position);
+  min-width: max-content;
+  padding: 5px 8px;
+  border: 1px solid var(--liang-border, rgb(0 0 0 / 12%));
+  border-radius: 7px;
+  color: var(--liang-ink, #171816);
+  background: var(--liang-layer-1, #fff);
+  box-shadow: 0 5px 16px rgb(0 0 0 / 16%);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.liang-effort-control__tooltip::after {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  content: "";
+  background: inherit;
+  transform: translate(-50%, -4px) rotate(45deg);
+}
+
+.liang-effort-control__tick {
+  position: absolute;
+  top: 50%;
+  width: 1px;
+  height: 7px;
+  background: var(--liang-control-accent);
+  opacity: 0.42;
+  transform: translate(-50%, -50%);
+}
+
+.liang-effort-control__range {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 28px;
+  margin: 0;
+  cursor: ew-resize;
+  appearance: none;
+  background: transparent;
+  touch-action: pan-y;
+}
+
+.liang-effort-control__range:disabled {
+  cursor: progress;
+  opacity: 0.58;
+}
+
+.liang-effort-control__range::-webkit-slider-runnable-track {
+  height: 1px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, var(--liang-control-accent) 0 var(--liang-slider-progress), var(--liang-control-rail) var(--liang-slider-progress) 100%);
+}
+
+.liang-effort-control__range::-webkit-slider-thumb {
+  width: 13px;
+  height: 13px;
+  margin-top: -6px;
+  border: 1.5px solid color-mix(in srgb, var(--liang-control-accent) 72%, transparent);
+  border-radius: 50%;
+  appearance: none;
+  background: radial-gradient(circle, var(--liang-control-accent) 0 2px, color-mix(in srgb, var(--liang-control-accent) 22%, var(--dsw-alias-bg-layer-1, #fff)) 2.5px);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 14%);
+}
+
+body[data-liang-skin="on"] .liang-effort-control__range::-webkit-slider-thumb {
+  width: 13px;
+  height: 13px;
+  margin-top: -6px;
+  border-color: color-mix(in srgb, var(--liang-control-accent) 72%, transparent);
+  background: radial-gradient(circle, var(--liang-control-accent) 0 2px, color-mix(in srgb, var(--liang-control-accent) 22%, var(--liang-layer-1)) 2.5px);
+}
+
+.liang-effort-control__range::-moz-range-track {
+  height: 1px;
+  background: var(--liang-control-rail);
+}
+
+.liang-effort-control__range::-moz-range-progress {
+  height: 1px;
+  background: var(--liang-control-accent);
+}
+
+.liang-effort-control__range::-moz-range-thumb {
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid color-mix(in srgb, var(--liang-control-accent) 72%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--liang-control-accent) 24%, var(--dsw-alias-bg-layer-1, #fff));
+}
+
+.liang-effort-control__range:focus-visible {
+  outline: none;
+}
+
+.liang-effort-control[data-state="error"] {
+  --liang-control-accent: var(--dsw-alias-state-error-primary, #e43c3c);
+}
+
+.liang-settings-row {
+  display: flex;
+  min-height: 82px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--dsw-alias-border-l1, rgb(0 0 0 / 6%));
+  color: var(--dsw-alias-label-primary);
+}
+
+.liang-settings-row__title {
+  flex: 0 0 auto;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.liang-settings-row__choices {
+  display: flex;
+  gap: 8px;
+}
+
+.liang-settings-row__choice {
+  min-width: 76px;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--dsw-alias-border-l2, rgb(0 0 0 / 10%));
+  border-radius: 10px;
+  color: var(--dsw-alias-label-secondary);
+  background: var(--dsw-alias-bg-layer-1);
+  cursor: pointer;
+}
+
+.liang-settings-row__choice:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.liang-settings-row__choice[aria-pressed="true"] {
+  border-color: var(--dsw-alias-label-primary);
+  color: var(--dsw-alias-label-primary);
+  box-shadow: inset 0 0 0 1px var(--dsw-alias-label-primary);
+}
+
+@media (max-width: 760px) {
+  .liang-effort-control {
+    width: 92px;
+  }
+
+  .liang-skin-backdrop video,
+  .liang-skin-backdrop img {
+    right: -18vw;
+    width: 92vw;
+    opacity: calc(var(--liang-portrait-opacity, 0.45) * 0.72);
+  }
+
+  .liang-settings-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liang-skin-backdrop,
+  .liang-skin-backdrop video,
+  .liang-skin-backdrop img,
+  body[data-liang-skin="on"] button,
+  body[data-liang-skin="on"] input,
+  body[data-liang-skin="on"] textarea {
+    transition: none;
+  }
+}
