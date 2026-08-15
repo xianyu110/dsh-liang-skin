@@ -44,19 +44,28 @@
 
 ## 安装
 
-需要先安装 DeepSeek Harness CLI；当前版本已在 `0.1.0-rc.6` 上验证。可以直接从 Git 安装：
+需要先安装 DeepSeek Harness CLI；当前版本已在 `0.1.0-rc.6` 上验证。安装本身可以在 DSH 运行时执行（只改动磁盘配置），重启后生效。三种方式任选其一：
+
+### 方式一：从 GitHub 安装（固定 release tag）
 
 ```sh
-dsh plugin --profile web add 'github:kingOfSoySauce/dsh-liang-skin#v0.1.1'
-dsh --profile web --dump-config
-dsh --profile web
+dsh plugin --profile web add 'github:kingOfSoySauce/dsh-liang-skin#v0.1.2'
+dsh --profile web --dump-config | grep -B1 -A2 liang-intensity
 ```
-
-如果正式 DSH 已经在运行，安装后需要先停止旧进程，再重新启动。
 
 版本号固定为已验证的 release tag，之后推送到 `main` 的改动不会静默改变已安装代码。
 
-也可以克隆后从本地路径安装：
+### 方式二：从 GitHub Release tarball 安装
+
+从本仓库 [Releases](https://github.com/kingOfSoySauce/dsh-liang-skin/releases) 页面下载 `dsh-client-liang-intensity-skin-0.1.2.tgz`（包内已包含构建好的 `lib/client.js`，安装时不需要执行任何 prepare 脚本），然后：
+
+```sh
+dsh plugin --profile web add ./dsh-client-liang-intensity-skin-0.1.2.tgz
+```
+
+适合不方便走 git 的环境；相对路径按你运行命令的目录解析。
+
+### 方式三：克隆后从本地路径安装（开发迭代）
 
 ```sh
 git clone https://github.com/kingOfSoySauce/dsh-liang-skin.git
@@ -64,27 +73,33 @@ cd dsh-liang-skin
 dsh plugin --profile web add .
 ```
 
-`--dump-config` 的输出中应出现 `dsh-client-liang-intensity-skin` 配置层。要卸载插件：
+`dsh plugin` 会把相对路径锚定到**你运行命令的目录**（而不是 profile 目录），所以在克隆目录里执行 `add .` 装的是指向克隆目录的 link 依赖：改完源码运行 `npm run build`，重启 DSH 即生效，无需重新安装。
+
+### 验证与重启
+
+安装成功后 `dsh plugin` 会自动把插件注册进 profile 的 `dsh.profile.bundles`（见 `~/.dsh/profiles/web/package.json`），无需手动改配置；`--dump-config` 的输出中应出现 `dsh-client-liang-intensity-skin` 配置层（上面命令里的 grep 就是为此准备的）。
+
+如果正式 DSH 正在运行，让执行安装的 agent 给用户两个选择：
+
+- **a. agent 自行重启**：agent 终止旧进程后重新运行 `dsh web`；
+- **b. 用户手动重启（推荐）**：在运行 DSH 的终端按 Ctrl+C，再运行 `dsh web`。
+
+重启后浏览器会自动加载新的客户端插件，无需强制刷新。当前会话会中断，但 DSH 会话有磁盘持久化，重启后可以恢复。
+
+### 卸载
 
 ```sh
 dsh plugin --profile web remove dsh-client-liang-intensity-skin
 ```
 
-### 从 GitHub Release tarball 安装
+`remove` 会自动把插件从 `dsh.profile.bundles` 中摘除；重启后设置入口完全移除。
 
-发布者可在仓库根目录生成可分发包：
+### 常见问题
 
-```sh
-npm pack
-```
-
-将生成的 `.tgz` 上传为 GitHub Release 附件后，用户下载并安装：
-
-```sh
-dsh plugin --profile web add ./dsh-client-liang-intensity-skin-0.1.1.tgz
-```
-
-包内已包含构建好的 `lib/client.js`，安装时不需要执行第三方 `prepare` 脚本。
+- **pnpm 阻止构建脚本**：pnpm ≥ 10 默认不执行第三方依赖的 build/prepare 脚本。当前皮肤没有 prepare 脚本，正常不会触发；若 pnpm 安装失败并给出提示，按 dsh 打印的说明在 `~/.dsh/profiles/web/pnpm-workspace.yaml` 的 `allowBuilds` 下加入对应 key 后重试。
+- **网络**：方式一需要能访问 github.com（pnpm 经 codeload 拉取）；方式二只需能下载 GitHub Release 附件。
+- **pnpm 缺失**：`dsh plugin` 依赖 PATH 里的 pnpm，缺失时会明确提示。
+- **端口占用**：`dsh web` 默认监听 3080（可用 `--port` 修改），重启前确认旧进程已退出。
 
 ## 本地开发
 
