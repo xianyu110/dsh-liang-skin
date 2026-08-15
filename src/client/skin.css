@@ -100,6 +100,14 @@ body[data-liang-skin="on"] {
   --dsw-specific-input-major: var(--liang-layer-1) !important;
   --dsw-specific-menu: var(--liang-layer-3) !important;
   --dsw-specific-selector: var(--liang-layer-2) !important;
+  --dsw-alias-markdown-citation: var(--liang-layer-2) !important;
+  --dsw-alias-markdown-code-block-banner: var(--liang-layer-1) !important;
+  --dsw-alias-markdown-code-block: var(--liang-layer-1) !important;
+  --dsw-alias-markdown-code-segment-selected: var(--liang-layer-2) !important;
+  --dsw-alias-markdown-code-segment-unselected: var(--liang-layer-1) !important;
+  --dsw-alias-markdown-inline-code: var(--liang-layer-2) !important;
+  --dsw-alias-markdown-placeholder: var(--liang-layer-1) !important;
+  --dsw-alias-markdown-tag: var(--liang-layer-2) !important;
   background: var(--liang-page) !important;
 }
 
@@ -135,10 +143,85 @@ body[data-liang-skin="on"][data-liang-stage="5"] {
   --dsw-alias-button-info-fill: #c19a49 !important;
   --dsw-alias-button-info-hover: #d5b56e !important;
   --dsw-alias-state-business-primary: #c19a49 !important;
+  --dsw-alias-bg-module-platform: var(--liang-layer-3) !important;
+  --dsw-specific-sidebar-nav-item-active: var(--liang-layer-3) !important;
+  --dsw-specific-sidebar-nav-item-hover: var(--liang-hover) !important;
 }
 
-/* Preserve the wordmark badge contrast even when the underlying Harness
-   preference is dark while our low-intensity shell is light. */
+/* The low-intensity skin is light by default, but it must not turn a dark
+   Harness document into a light surface. Keep the skin's portrait progression
+   while switching the shared UI layers back to a readable charcoal palette. */
+body[data-liang-skin="on"][data-ds-dark-theme]:is(
+  [data-liang-stage="0"],
+  [data-liang-stage="1"],
+  [data-liang-stage="2"],
+  [data-liang-stage="3"]
+) {
+  --liang-page: rgb(17 17 17) !important;
+  --liang-bg-base: rgb(17 17 17 / 42%) !important;
+  --liang-layer-1: rgb(30 27 25 / 94%) !important;
+  --liang-layer-2: rgb(41 35 30 / 96%) !important;
+  --liang-layer-3: rgb(41 35 30 / 99%) !important;
+  --liang-sidebar: rgb(23 20 18 / 96%) !important;
+  --liang-ink: rgb(244 241 232) !important;
+  --liang-secondary: rgb(184 180 169) !important;
+  --liang-tertiary: rgb(137 134 126) !important;
+  --liang-border: rgb(244 241 232 / 15%) !important;
+  --liang-hover: rgb(244 241 232 / 9%) !important;
+  --dsw-alias-brand-primary: var(--liang-accent) !important;
+  --dsw-alias-brand-text: var(--liang-accent) !important;
+  --dsw-alias-button-primary-fill: var(--liang-accent) !important;
+  --dsw-alias-button-primary-hover: var(--liang-accent-hover) !important;
+  --dsw-alias-button-info-fill: var(--liang-accent) !important;
+  --dsw-alias-button-info-hover: var(--liang-accent-hover) !important;
+  --dsw-alias-state-business-primary: var(--liang-accent) !important;
+  --dsw-alias-button-elevated-fill: var(--liang-layer-1) !important;
+  --dsw-alias-button-floating-fill: var(--liang-layer-2) !important;
+  --dsw-alias-button-floating-hover: var(--liang-layer-3) !important;
+  --dsw-alias-interactive-bg-hover-solid: var(--liang-layer-2) !important;
+  --dsw-specific-bubble: var(--liang-layer-2) !important;
+  --dsw-specific-input-major: var(--liang-layer-1) !important;
+  --dsw-specific-menu: var(--liang-layer-3) !important;
+  --dsw-specific-selector: var(--liang-layer-2) !important;
+  background: var(--liang-page) !important;
+}
+
+body[data-liang-skin="on"][data-ds-dark-theme]:is(
+  [data-liang-stage="0"],
+  [data-liang-stage="1"],
+  [data-liang-stage="2"],
+  [data-liang-stage="3"]
+) .liang-skin-backdrop {
+  background: var(--liang-page) !important;
+}
+
+body[data-liang-skin="on"][data-ds-dark-theme]:is(
+  [data-liang-stage="0"],
+  [data-liang-stage="1"],
+  [data-liang-stage="2"],
+  [data-liang-stage="3"]
+) .liang-skin-backdrop::after {
+  background: linear-gradient(90deg, var(--liang-page) 0 28%, transparent 57% 100%);
+}
+
+/* The host's running-turn label uses a transparent blue shimmer. In the
+   custom dark skin it is a semantic status accent, so keep both the label
+   and its elapsed clock gold without changing the original light theme. */
+body[data-liang-skin="on"][data-liang-stage="5"] [class*="_turnStatus"] {
+  color: #c19a49 !important;
+  background: #c19a49 !important;
+  background-clip: initial !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: #c19a49 !important;
+  animation: none !important;
+}
+
+body[data-liang-skin="on"][data-liang-stage="5"] [class*="_turnStatusClock"] {
+  color: #c19a49 !important;
+  -webkit-text-fill-color: #c19a49 !important;
+}
+
+/* Preserve the wordmark badge contrast in the low-intensity shell. */
 body[data-liang-skin="on"]:is(
   [data-liang-stage="0"],
   [data-liang-stage="1"],
@@ -219,9 +302,8 @@ body[data-liang-skin="on"] textarea {
   transition: color 160ms linear, background-color 160ms linear, border-color 160ms linear;
 }
 
-/* Harness can itself be in dark mode while the low intensity stages are light.
-   The composer card has a native theme-mode fill, so explicitly bring only
-   those light stages back to the original light surface and readable ink. */
+/* The composer card has a native theme-mode fill, so keep its surface and
+   readable ink aligned with the active Liang palette. */
 body[data-liang-skin="on"]:is(
   [data-liang-stage="0"],
   [data-liang-stage="1"],

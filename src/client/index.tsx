@@ -65,6 +65,13 @@ interface PreferenceStore {
   dispose(): void;
 }
 
+type NativeThemeId = "light" | "dark";
+
+interface ThemeService {
+  getTheme(): { preference: string };
+  setTheme(id: NativeThemeId): void;
+}
+
 interface ModelSelection {
   provider: string;
   model: string;
@@ -126,6 +133,7 @@ const cssVariables = [
 
 class SkinPresenter {
   private readonly scope: PreferenceStore;
+  private readonly theme: ThemeService;
   private readonly root: HTMLDivElement;
   private readonly video: HTMLVideoElement;
   private readonly poster: HTMLImageElement;
@@ -138,8 +146,9 @@ class SkinPresenter {
   private disposed = false;
   private unsubscribe: () => void;
 
-  constructor(scope: PreferenceStore) {
+  constructor(scope: PreferenceStore, theme: ThemeService) {
     this.scope = scope;
+    this.theme = theme;
     this.root = document.createElement("div");
     this.root.className = "liang-skin-backdrop";
     this.root.dataset.plugin = PACKAGE_ID;
@@ -242,6 +251,7 @@ class SkinPresenter {
   private applyFrame() {
     const palette = paletteForFrame(this.frame);
     const body = document.body;
+    this.syncNativeTheme(palette.stage === 5 ? "dark" : "light");
     body.dataset.liangStage = String(palette.stage);
     body.style.setProperty("--liang-strength", String(palette.strength));
     body.style.setProperty("--liang-page", palette.page);
@@ -260,6 +270,11 @@ class SkinPresenter {
     body.style.setProperty("--liang-portrait-opacity", palette.portraitOpacity);
     this.updatePortrait(palette.level);
     this.seek(this.frame);
+  }
+
+  syncNativeTheme(theme: NativeThemeId = paletteForFrame(this.frame).stage === 5 ? "dark" : "light") {
+    if (!this.enabled || this.theme.getTheme().preference === theme) return;
+    this.theme.setTheme(theme);
   }
 
   private updatePortrait(level: number) {
@@ -515,6 +530,7 @@ export const inject = [
   "sessions",
   "modelDirectories",
   "locale",
+  "theme",
 ];
 
 function createPreferenceStore(): PreferenceStore {
@@ -558,8 +574,13 @@ export function apply(ctx: ClientContext) {
 
   const scope = createPreferenceStore();
   ctx.effect(() => () => scope.dispose(), "liang-intensity-skin: appearance preference");
-  const presenter = new SkinPresenter(scope);
+  const theme = ctx.get("theme") as ThemeService;
+  const presenter = new SkinPresenter(scope, theme);
   ctx.effect(() => () => presenter.dispose(), "liang-intensity-skin: backdrop presenter");
+  ctx.effect(
+    () => ctx.on("theme/change", () => presenter.syncNativeTheme()),
+    "liang-intensity-skin: native theme synchronization",
+  );
 
   ctx.effect(() => ctx.locale.register(LOCALE_NAMESPACE, {
     zh: {
