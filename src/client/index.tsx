@@ -26,6 +26,7 @@ const LOCALE_NAMESPACE = "liang.skin";
 const ASSET_PREFIX = `/plugins/${PACKAGE_ID}/assets`;
 const VIDEO_DURATION = 8.033;
 const PREFERENCE_KEY = "dsh-liang-intensity-skin.enabled";
+const BIND_EFFORT_KEY = "dsh-liang-intensity-skin.bind-effort";
 
 const PORTRAIT_ANCHORS = [
   { level: 0, file: "stage-00.png" },
@@ -56,12 +57,14 @@ const PORTRAIT_ANCHORS = [
 
 interface SkinSettings {
   enabled: boolean;
+  bindEffort: boolean;
 }
 
 interface PreferenceStore {
   getSnapshot(): SkinSettings;
   subscribe(listener: () => void): () => void;
   set(enabled: boolean): Promise<void>;
+  setBindEffort(enabled: boolean): Promise<void>;
   dispose(): void;
 }
 
@@ -224,6 +227,10 @@ class SkinPresenter {
     return this.enabled;
   }
 
+  getFrame() {
+    return this.frame;
+  }
+
   setEnabled(enabled: boolean) {
     this.enabled = enabled;
     if (enabled) {
@@ -358,11 +365,13 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
   const committedFrame = committedIndex < 0
     ? 0
     : frameForEffort(committedIndex, efforts.length);
-  const [frame, setFrame] = useState(committedFrame);
+  const bindEffort = skin.bindEffort;
+  const [frame, setFrame] = useState(() => bindEffort ? committedFrame : presenter.getFrame());
   const [pending, setPending] = useState(false);
   const [failed, setFailed] = useState(false);
   const [interacting, setInteracting] = useState(false);
   const dragging = useRef(false);
+  const dragStartFrame = useRef(frame);
   const enabled = skin.enabled;
 
   useEffect(() => {
@@ -370,19 +379,26 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
   }, [enabled, load]);
 
   useEffect(() => {
-    if (dragging.current || pending) return;
+    if (!bindEffort || dragging.current || pending) return;
     setFrame(committedFrame);
     presenter.setFrame(committedFrame);
-  }, [committedFrame, pending, presenter]);
+  }, [bindEffort, committedFrame, pending, presenter]);
 
   if (!enabled) return null;
-  if (reasoning === null || efforts.length < 2) return null;
+  if (bindEffort && (reasoning === null || efforts.length < 2)) return null;
 
   const previewIndex = nearestEffortIndex(frame, efforts);
   const previewEffort = efforts[previewIndex];
   const progressRatio = frame / PREVIEW_MAX_FRAME;
+  const tooltipLabel = indicatorLabel(frame, bindEffort ? efforts : []);
 
   const commit = async (rawFrame: number) => {
+    if (!bindEffort) {
+      dragging.current = false;
+      setFrame(rawFrame);
+      presenter.setFrame(rawFrame);
+      return;
+    }
     const targetIndex = nearestEffortIndex(rawFrame, efforts);
     const target = efforts[targetIndex];
     if (target === undefined) return;
@@ -411,14 +427,14 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
       className="liang-effort-control"
       data-plugin={PACKAGE_ID}
       data-state={failed ? "error" : pending ? "pending" : "ready"}
-      title={previewEffort?.name}
+      title={bindEffort ? previewEffort?.name : undefined}
     >
       {interacting && (
         <output
           className="liang-effort-control__tooltip"
           style={{ "--liang-slider-ratio": progressRatio } as React.CSSProperties}
         >
-          {indicatorLabel(frame, efforts)}
+          {tooltipLabel}
         </output>
       )}
       <div className="liang-effort-control__ticks" aria-hidden="true">
@@ -438,10 +454,11 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
         step={1}
         value={frame}
         disabled={pending || state.status === "selecting"}
-        aria-label="思考等级"
-        aria-valuetext={previewEffort?.name ?? ""}
+        aria-label={bindEffort ? "思考等级" : "皮肤进度"}
+        aria-valuetext={bindEffort ? previewEffort?.name ?? "" : tooltipLabel}
         onPointerDown={() => {
           dragging.current = true;
+          dragStartFrame.current = frame;
           setInteracting(true);
         }}
         onInput={(event) => {
@@ -457,8 +474,8 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
         onPointerCancel={() => {
           setInteracting(false);
           dragging.current = false;
-          setFrame(committedFrame);
-          presenter.setFrame(committedFrame);
+          setFrame(dragStartFrame.current);
+          presenter.setFrame(dragStartFrame.current);
         }}
         onKeyUp={(event) => {
           setInteracting(false);
@@ -473,8 +490,8 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
           if (event.key === "Escape" && !pending) {
             setInteracting(false);
             dragging.current = false;
-            setFrame(committedFrame);
-            presenter.setFrame(committedFrame);
+            setFrame(dragStartFrame.current);
+            presenter.setFrame(dragStartFrame.current);
           }
         }}
       />
@@ -587,6 +604,8 @@ function AppearanceSkinRow({ scope, presenter, theme, subscribeTheme, t }: Setti
 const NATIVE_APPEARANCE_GROUP = '[class*="_8HJdBW_group"]';
 const NATIVE_APPEARANCE_ROW = '[class*="_8HJdBW_cubeRow"]';
 const LIANG_APPEARANCE_BUTTON = "liang-appearance-choice";
+const LIANG_BINDING_CONTROL = "liang-appearance-binding";
+const LIANG_BINDING_INPUT = "liang-appearance-binding__input";
 
 function installLiangAppearanceButton(scope: PreferenceStore, presenter: SkinPresenter) {
   let pending = false;
@@ -630,8 +649,59 @@ function installLiangAppearanceButton(scope: PreferenceStore, presenter: SkinPre
     }
 
     if (customButton.parentElement !== row) row.append(customButton);
+    const snapshot = scope.getSnapshot();
     customButton.disabled = pending;
-    customButton.setAttribute("aria-pressed", String(scope.getSnapshot().enabled));
+    customButton.setAttribute("aria-pressed", String(snapshot.enabled));
+
+    let bindingControl = group.querySelector<HTMLElement>(`.${LIANG_BINDING_CONTROL}`);
+    if (!snapshot.enabled) {
+      bindingControl?.remove();
+      bindingControl = null;
+    } else if (bindingControl === null) {
+      bindingControl = document.createElement("label");
+      bindingControl.className = LIANG_BINDING_CONTROL;
+      bindingControl.dataset.plugin = PACKAGE_ID;
+
+      const bindingCopy = document.createElement("span");
+      bindingCopy.className = "liang-appearance-binding__copy";
+
+      const bindingLabel = document.createElement("span");
+      bindingLabel.className = "liang-appearance-binding__label";
+      const bindingText = document.documentElement.lang.toLowerCase().startsWith("en")
+        ? "Bind slider to reasoning level"
+        : "滑动变祖绑定思考等级";
+      bindingLabel.textContent = bindingText;
+
+      const bindingDescription = document.createElement("span");
+      bindingDescription.className = "liang-appearance-binding__description";
+      bindingDescription.id = "liang-appearance-binding-description";
+      bindingDescription.textContent = document.documentElement.lang.toLowerCase().startsWith("en")
+        ? "When off, the slider does not change the reasoning level."
+        : "关闭之后滑块不联动思考等级";
+      bindingCopy.append(bindingLabel, bindingDescription);
+
+      const bindingInput = document.createElement("input");
+      bindingInput.className = LIANG_BINDING_INPUT;
+      bindingInput.type = "checkbox";
+      bindingInput.setAttribute("role", "switch");
+      bindingInput.setAttribute("aria-label", bindingText);
+      bindingInput.setAttribute("aria-describedby", bindingDescription.id);
+      bindingInput.addEventListener("change", () => {
+        void scope.setBindEffort(bindingInput.checked).catch(() => sync());
+      });
+
+      bindingControl.append(bindingCopy, bindingInput);
+      group.append(bindingControl);
+    }
+
+    if (bindingControl !== null) {
+      const bindingInput = bindingControl.querySelector<HTMLInputElement>(`.${LIANG_BINDING_INPUT}`);
+      if (bindingInput !== null) {
+        bindingInput.checked = snapshot.bindEffort;
+        bindingInput.setAttribute("aria-checked", String(snapshot.bindEffort));
+        bindingInput.disabled = pending;
+      }
+    }
 
     for (const nativeButton of row.querySelectorAll<HTMLButtonElement>('[class*="_8HJdBW_themeCube"]')) {
       if (hookedNativeButtons.has(nativeButton)) continue;
@@ -662,6 +732,7 @@ function installLiangAppearanceButton(scope: PreferenceStore, presenter: SkinPre
       nativeButton.removeEventListener("click", handleNativeClick, { capture: true });
     }
     document.querySelectorAll(`.${LIANG_APPEARANCE_BUTTON}`).forEach((button) => button.remove());
+    document.querySelectorAll(`.${LIANG_BINDING_CONTROL}`).forEach((control) => control.remove());
   };
 }
 
@@ -676,13 +747,17 @@ export const inject = [
 function createPreferenceStore(): PreferenceStore {
   let snapshot: SkinSettings = {
     enabled: localStorage.getItem(PREFERENCE_KEY) !== "0",
+    bindEffort: localStorage.getItem(BIND_EFFORT_KEY) !== "0",
   };
   const listeners = new Set<() => void>();
   const onStorage = (event: StorageEvent) => {
-    if (event.key !== PREFERENCE_KEY) return;
-    const enabled = event.newValue !== "0";
-    if (enabled === snapshot.enabled) return;
-    snapshot = { enabled };
+    if (event.key !== PREFERENCE_KEY && event.key !== BIND_EFFORT_KEY) return;
+    const next = {
+      enabled: event.key === PREFERENCE_KEY ? event.newValue !== "0" : snapshot.enabled,
+      bindEffort: event.key === BIND_EFFORT_KEY ? event.newValue !== "0" : snapshot.bindEffort,
+    };
+    if (next.enabled === snapshot.enabled && next.bindEffort === snapshot.bindEffort) return;
+    snapshot = next;
     for (const listener of listeners) listener();
   };
   window.addEventListener("storage", onStorage);
@@ -695,7 +770,13 @@ function createPreferenceStore(): PreferenceStore {
     async set(enabled) {
       if (enabled === snapshot.enabled) return;
       localStorage.setItem(PREFERENCE_KEY, enabled ? "1" : "0");
-      snapshot = { enabled };
+      snapshot = { ...snapshot, enabled };
+      for (const listener of listeners) listener();
+    },
+    async setBindEffort(bindEffort) {
+      if (bindEffort === snapshot.bindEffort) return;
+      localStorage.setItem(BIND_EFFORT_KEY, bindEffort ? "1" : "0");
+      snapshot = { ...snapshot, bindEffort };
       for (const listener of listeners) listener();
     },
     dispose() {
