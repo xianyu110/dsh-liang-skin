@@ -145,8 +145,10 @@ class SkinPresenter {
   private readonly portrait: HTMLImageElement;
   private readonly preloads: HTMLImageElement[];
   private enabled = true;
-  private frame = 0;
-  private pendingFrame = 0;
+  // Default to the max frame so the first paint after load is the dark shell;
+  // starting at 0 flashed the light palette before the directory resolved.
+  private frame = PREVIEW_MAX_FRAME;
+  private pendingFrame = PREVIEW_MAX_FRAME;
   private raf = 0;
   private disposed = false;
   private unsubscribe: () => void;
@@ -362,8 +364,11 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
     reasoning?.selection.reasoningEffort,
     reasoning?.defaultEffort,
   );
+  // An unknown committed effort defaults to the max frame: a fresh
+  // conversation paints the dark shell immediately instead of flashing the
+  // light palette until the directory load resolves the real effort.
   const committedFrame = committedIndex < 0
-    ? 0
+    ? PREVIEW_MAX_FRAME
     : frameForEffort(committedIndex, efforts.length);
   const bindEffort = skin.bindEffort;
   const [frame, setFrame] = useState(() => bindEffort ? committedFrame : presenter.getFrame());
