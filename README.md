@@ -6,6 +6,12 @@
 帮我安装这个仓库的皮肤到我的 DSH，地址：https://github.com/kingOfSoySauce/dsh-liang-skin
 ```
 
+## 更多 DSH 皮肤
+
+[前往 DSH 皮肤市场，浏览更多社区皮肤](https://kingofsoysauce.github.io/dsh-skin-market/)
+
+[安装皮肤市场或提交皮肤](https://github.com/kingOfSoySauce/dsh-skin-market)
+
 ## 效果展示
 
 <table>
