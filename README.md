@@ -1,14 +1,20 @@
 # 滑动变祖 · DeepSeek Harness 皮肤
 
+### 方式一：原版安装
+
 复制给你的 DSH，一键安装：
 
 ```text
 帮我安装这个仓库的皮肤到我的 DSH，地址：https://github.com/kingOfSoySauce/dsh-liang-skin
 ```
 
+### 方式二：插件市场一键安装（推荐）
+
+打开 DSH 的「设置 → 皮肤市场」，搜索“滑动变祖”，点击“一键安装”，按提示重启 DSH Web 即可。尚未安装皮肤市场？请先按[安装说明](https://github.com/kingOfSoySauce/dsh-skin-market#安装皮肤市场)完成安装。
+
 ## 更多 DSH 皮肤
 
-[前往 DSH 皮肤市场，浏览更多社区皮肤](https://kingofsoysauce.github.io/dsh-skin-market/)
+想发现更多社区皮肤，欢迎[前往 DSH 皮肤市场](https://kingofsoysauce.github.io/dsh-skin-market/)浏览和一键安装。
 
 [安装皮肤市场或提交皮肤](https://github.com/kingOfSoySauce/dsh-skin-market)
 
