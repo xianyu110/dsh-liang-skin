@@ -25,7 +25,6 @@ const PACKAGE_ID = "dsh-client-liang-intensity-skin";
 const LOCALE_NAMESPACE = "liang.skin";
 const ASSET_PREFIX = `/plugins/${PACKAGE_ID}/assets`;
 const VIDEO_DURATION = 8.033;
-const PREFERENCE_KEY = "dsh-liang-intensity-skin.enabled";
 const BIND_EFFORT_KEY = "dsh-liang-intensity-skin.bind-effort";
 
 const PORTRAIT_ANCHORS = [
@@ -750,16 +749,24 @@ export const inject = [
 ];
 
 function createPreferenceStore(): PreferenceStore {
+  // The market's active skin is the source of truth for whether this client
+  // should be visible. The appearance switch is therefore scoped to this
+  // client activation and must not survive switching away and back.
+  try {
+    localStorage.removeItem("dsh-liang-intensity-skin.enabled");
+  } catch {
+    // Storage may be unavailable; the in-memory default still enables Liang.
+  }
   let snapshot: SkinSettings = {
-    enabled: localStorage.getItem(PREFERENCE_KEY) !== "0",
+    enabled: true,
     bindEffort: localStorage.getItem(BIND_EFFORT_KEY) !== "0",
   };
   const listeners = new Set<() => void>();
   const onStorage = (event: StorageEvent) => {
-    if (event.key !== PREFERENCE_KEY && event.key !== BIND_EFFORT_KEY) return;
+    if (event.key !== BIND_EFFORT_KEY) return;
     const next = {
-      enabled: event.key === PREFERENCE_KEY ? event.newValue !== "0" : snapshot.enabled,
-      bindEffort: event.key === BIND_EFFORT_KEY ? event.newValue !== "0" : snapshot.bindEffort,
+      enabled: snapshot.enabled,
+      bindEffort: event.newValue !== "0",
     };
     if (next.enabled === snapshot.enabled && next.bindEffort === snapshot.bindEffort) return;
     snapshot = next;
@@ -774,7 +781,6 @@ function createPreferenceStore(): PreferenceStore {
     },
     async set(enabled) {
       if (enabled === snapshot.enabled) return;
-      localStorage.setItem(PREFERENCE_KEY, enabled ? "1" : "0");
       snapshot = { ...snapshot, enabled };
       for (const listener of listeners) listener();
     },
