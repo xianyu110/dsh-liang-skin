@@ -69,7 +69,7 @@ dsh plugin --profile web add 'github:kingOfSoySauce/dsh-liang-skin'
 
 ## 命令安装
 
-需要先安装 DeepSeek Harness CLI；当前版本已在 `0.1.0-rc.6` 上验证。安装本身可以在 DSH 运行时执行（只改动磁盘配置），重启后生效。三种方式任选其一：
+需要先安装 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)；当前版本已在 `0.1.0-rc.6` 上验证。安装本身可以在 DSH 运行时执行（只改动磁盘配置），重启后生效。三种方式任选其一：
 
 > 安装前请确保已关闭其他皮肤插件，避免冲突。
 
