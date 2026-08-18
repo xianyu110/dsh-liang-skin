@@ -143,6 +143,7 @@ class SkinPresenter {
   private readonly poster: HTMLImageElement;
   private readonly portrait: HTMLImageElement;
   private readonly preloads: HTMLImageElement[];
+  private portraitReady = false;
   private enabled = true;
   // Default to the max frame so the first paint after load is the dark shell;
   // starting at 0 flashed the light palette before the directory resolved.
@@ -158,7 +159,10 @@ class SkinPresenter {
     this.root = document.createElement("div");
     this.root.className = "liang-skin-backdrop";
     this.root.dataset.plugin = PACKAGE_ID;
-    this.root.dataset.media = "sequence";
+    // Keep the stable poster visible while every portrait frame is fetched
+    // and decoded. A request being complete does not mean the bitmap is ready
+    // for a tear-free first swap.
+    this.root.dataset.media = "poster";
     this.root.setAttribute("aria-hidden", "true");
 
     this.poster = document.createElement("img");
@@ -175,10 +179,27 @@ class SkinPresenter {
 
     this.preloads = PORTRAIT_ANCHORS.map(({ file }) => {
       const image = new Image();
+      image.loading = "eager";
       image.decoding = "async";
       image.src = `${ASSET_PREFIX}/portrait-source-v2/${file}`;
       return image;
     });
+
+    // `new Image()` starts the requests, but the browser may still defer
+    // decoding until the image is attached to the document. Wait for all
+    // frames up front so the first slider interaction never reveals a blank
+    // or half-painted frame.
+    void Promise.all(this.preloads.map((image) => image.decode())).then(
+      () => {
+        if (this.disposed) return;
+        this.portraitReady = true;
+        this.root.dataset.media = "sequence";
+        this.updatePortrait(paletteForFrame(this.frame).level);
+      },
+      () => {
+        if (!this.disposed) this.root.dataset.media = "poster";
+      },
+    );
 
     this.root.append(this.portrait, this.poster);
     document.body.prepend(this.root);
@@ -263,6 +284,7 @@ class SkinPresenter {
   }
 
   private updatePortrait(level: number) {
+    if (!this.portraitReady) return;
     const { lowerIndex, upperIndex, mix } = portraitBlendForLevel(
       level,
       ANCHOR_LEVELS,
