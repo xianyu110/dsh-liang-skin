@@ -82,10 +82,10 @@ dsh --profile web --dump-config | grep -B1 -A2 liang-intensity
 
 ### 方式二：从 GitHub Release tarball 安装
 
-从本仓库 [Releases](https://github.com/kingOfSoySauce/dsh-liang-skin/releases) 页面下载 `dsh-client-liang-intensity-skin-0.1.4.tgz`（包内已包含构建好的 `lib/client.js`，安装时不需要执行任何 prepare 脚本），然后：
+从本仓库 [Releases](https://github.com/kingOfSoySauce/dsh-liang-skin/releases) 页面下载 `dsh-client-liang-intensity-skin-0.1.6.tgz`（包内已包含构建好的 `lib/client.js`，安装时不需要执行任何 prepare 脚本），然后：
 
 ```sh
-dsh plugin --profile web add ./dsh-client-liang-intensity-skin-0.1.4.tgz
+dsh plugin --profile web add ./dsh-client-liang-intensity-skin-0.1.6.tgz
 ```
 
 
