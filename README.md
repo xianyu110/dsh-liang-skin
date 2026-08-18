@@ -1,22 +1,32 @@
 # 滑动变祖 · DeepSeek Harness 皮肤
 
-### 方式一：原版安装
+## 安装
 
-复制给你的 DSH，一键安装：
+##### 一、提示词安装：
+<details>
+<summary>点击展开</summary>
+
+复制以下提示词给 DSH；会先排查冲突再安装，所以较长：
 
 ```text
-帮我安装这个仓库的皮肤到我的 DSH，地址：https://github.com/kingOfSoySauce/dsh-liang-skin
+请把“滑动变祖”皮肤安装到 DSH 的 web profile。必须先检查冲突，确认可以继续后再安装。
+
+1. 安装前只读检查 web profile 的 package.json（dependencies 与 dsh.profile.bundles）、profile 的 cordis.patch.yml 和 $DSH_HOME/cordis.patch.yml（如有）。
+2. 从当前启用的 bundles 中识别其他皮肤、主题或外观插件：排除 @deepseek-ai/dsh-base、@deepseek-ai/dsh-web-app、dsh-skin-market 和本次目标 dsh-client-liang-intensity-skin；读取候选 package.json 的名称、描述、dsh.client/dsh.bundle 声明，必要时再读 README。
+3. 如果发现其他已启用的皮肤插件，列出它们并停在安装前，提醒我先停用；未经我确认不得修改任何 profile 文件，也不得执行安装。
+4. 如果没有冲突，明确说“未检测到其他已启用的皮肤插件”，然后执行：
+
+dsh plugin --profile web add 'github:kingOfSoySauce/dsh-liang-skin'
+
+5. 安装后读取 web profile 的 package.json，确认 dependencies 和 dsh.profile.bundles 中都有 dsh-client-liang-intensity-skin；再检查目标 package.json 的 dsh.client/dsh.bundle 声明和 liang-intensity-skin loader 注册项。任一缺失都要报告安装或注册失败。
+6. 告诉我如何重启 DSH Web。不要替我安装、停用或卸载其他皮肤。
 ```
 
-### 方式二：插件市场一键安装（推荐）
 
-打开 DSH 的「设置 → 皮肤市场」，搜索“滑动变祖”，点击“一键安装”，按提示重启 DSH Web 即可。尚未安装皮肤市场？请先按[安装说明](https://github.com/kingOfSoySauce/dsh-skin-market#安装皮肤市场)完成安装。
+</details>
 
-## 更多 DSH 皮肤
 
-想发现更多社区皮肤，欢迎[前往 DSH 皮肤市场](https://kingofsoysauce.github.io/dsh-skin-market/)浏览和一键安装。
-
-[安装皮肤市场或提交皮肤](https://github.com/kingOfSoySauce/dsh-skin-market)
+##### 二、或者[命令安装](#cli-install)；运行前请关闭其他皮肤插件，避免冲突
 
 ## 效果展示
 
@@ -25,17 +35,14 @@
     <td width="50%" align="center">
       <img src="docs/preview.png" alt="滑动变祖皮肤效果截图" width="100%">
       <br>
-      <sub>完整皮肤效果</sub>
     </td>
     <td width="50%" align="center">
       <img src="docs/demo.gif" alt="滑动变祖交互演示" width="100%">
       <br>
-      <sub>推理等级滑块演示</sub>
     </td>
   </tr>
 </table>
 
-把 Harness 的推理等级改为紧凑滑块，并用滑动变祖原项目的 0–30 强度映射同步人物、背景与界面配色。
 
 ## 交互规则
 
@@ -52,20 +59,24 @@
 - `滑动变祖`：显示滑块并启用人物、背景和自适应配色。
 - `原生`：移除背景层、皮肤变量和滑块，恢复 Harness 原生界面。
 
-“原生”只对当前 Liang client 激活周期生效；从皮肤市场切换到其他皮肤后再切回，梁祖皮肤会重新显示。该选择不会改动模型配置。
+选择保存在当前浏览器本地，不会改动模型配置。
 
-## 安装
+<a id="cli-install"></a>
+
+## 命令安装
 
 需要先安装 DeepSeek Harness CLI；当前版本已在 `0.1.0-rc.6` 上验证。安装本身可以在 DSH 运行时执行（只改动磁盘配置），重启后生效。三种方式任选其一：
 
-### 方式一：从 GitHub 安装（固定 release tag）
+> 安装前请确保已关闭其他皮肤插件，避免冲突。
+
+
+
+### 方式一：从 GitHub 安装最新版（推荐）
 
 ```sh
-dsh plugin --profile web add 'github:kingOfSoySauce/dsh-liang-skin#v0.1.4'
+dsh plugin --profile web add 'github:kingOfSoySauce/dsh-liang-skin'
 dsh --profile web --dump-config | grep -B1 -A2 liang-intensity
 ```
-
-版本号固定为已验证的 release tag，之后推送到 `main` 的改动不会静默改变已安装代码。
 
 ### 方式二：从 GitHub Release tarball 安装
 
@@ -74,6 +85,7 @@ dsh --profile web --dump-config | grep -B1 -A2 liang-intensity
 ```sh
 dsh plugin --profile web add ./dsh-client-liang-intensity-skin-0.1.4.tgz
 ```
+
 
 适合不方便走 git 的环境；相对路径按你运行命令的目录解析。
 
@@ -84,6 +96,7 @@ git clone https://github.com/kingOfSoySauce/dsh-liang-skin.git
 cd dsh-liang-skin
 dsh plugin --profile web add .
 ```
+
 
 `dsh plugin` 会把相对路径锚定到**你运行命令的目录**（而不是 profile 目录），所以在克隆目录里执行 `add .` 装的是指向克隆目录的 link 依赖：改完源码运行 `npm run build`，重启 DSH 即生效，无需重新安装。
 
