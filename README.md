@@ -28,7 +28,6 @@ dsh plugin --profile web add 'github:kingOfSoySauce/dsh-liang-skin'
 
 -  #### 方法三， 或者[命令安装](#cli-install)；运行前请关闭其他皮肤插件，避免冲突
 
-
 ## 更多 DSH 皮肤
 
 更多社区皮肤，点击[在线浏览皮肤市场](https://kingofsoysauce.github.io/dsh-skin-market/)
@@ -64,13 +63,13 @@ dsh plugin --profile web add 'github:kingOfSoySauce/dsh-liang-skin'
 - `滑动变祖`：显示滑块并启用人物、背景和自适应配色。
 - `原生`：移除背景层、皮肤变量和滑块，恢复 Harness 原生界面。
 
-“原生”只对当前 Liang client 激活周期生效；从皮肤市场切换到其他皮肤后再切回，梁祖皮肤会重新显示。该选择不会改动模型配置。
+选择保存在当前浏览器本地，不会改动模型配置。
 
 <a id="cli-install"></a>
 
 ## 命令安装
 
-需要先安装 DeepSeek Harness CLI；当前版本已在 `0.1.0-rc.6` 上验证。安装本身可以在 DSH 运行时执行（只改动磁盘配置），重启后生效。三种方式任选其一：
+需要先安装 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)；当前版本已在 `0.1.0-rc.6` 上验证。安装本身可以在 DSH 运行时执行（只改动磁盘配置），重启后生效。三种方式任选其一：
 
 > 安装前请确保已关闭其他皮肤插件，避免冲突。
 
@@ -89,6 +88,7 @@ dsh --profile web --dump-config | grep -B1 -A2 liang-intensity
 dsh plugin --profile web add ./dsh-client-liang-intensity-skin-0.1.4.tgz
 ```
 
+
 适合不方便走 git 的环境；相对路径按你运行命令的目录解析。
 
 ### 方式三：克隆后从本地路径安装（开发迭代）
@@ -98,6 +98,7 @@ git clone https://github.com/kingOfSoySauce/dsh-liang-skin.git
 cd dsh-liang-skin
 dsh plugin --profile web add .
 ```
+
 
 `dsh plugin` 会把相对路径锚定到**你运行命令的目录**（而不是 profile 目录），所以在克隆目录里执行 `add .` 装的是指向克隆目录的 link 依赖：改完源码运行 `npm run build`，重启 DSH 即生效，无需重新安装。
 
@@ -139,7 +140,7 @@ npm run build
 
 ## 灵感与素材来源
 
-本插件的“滑动变祖”视觉概念、人物图片与插帧视频素材源自
+本插件的“滑动变祖”视觉概念与人物图片素材源自
 [Lichtspektrum/liang-intensity-calibrator](https://github.com/Lichtspektrum/liang-intensity-calibrator)。插件在原项目 0–30 强度轴的基础上，将视觉变化接入 DeepSeek Harness 的推理等级选择。
 
 运行时素材已包含在插件中，安装后不需要额外下载。当前接入 24 张经过审核的人像锚点，滑动时直接切换最近锚点，不做图片交叉渐变。

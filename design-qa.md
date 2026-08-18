@@ -40,4 +40,4 @@ final result: passed
 
 - 24/24 portrait sources are present at `assets/portrait-source-v2/`
 - Final contact sheet: `assets/portrait-source-v2/references/contact-sheet-final-24.png`
-- Generation/video handoff: `assets/portrait-source-v2/GENERATION-BRIEF.md`
+- Portrait generation handoff: `assets/portrait-source-v2/GENERATION-BRIEF.md`
