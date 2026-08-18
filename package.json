@@ -17,8 +17,6 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "assets/liang-evolution.mp4",
-    "assets/liang-evolution.webm",
     "assets/liang-poster.png",
     "assets/portrait-source-v2/stage-00.png",
     "assets/portrait-source-v2/level-01.png",

@@ -138,7 +138,7 @@ npm run build
 
 ## 灵感与素材来源
 
-本插件的“滑动变祖”视觉概念、人物图片与插帧视频素材源自
+本插件的“滑动变祖”视觉概念与人物图片素材源自
 [Lichtspektrum/liang-intensity-calibrator](https://github.com/Lichtspektrum/liang-intensity-calibrator)。插件在原项目 0–30 强度轴的基础上，将视觉变化接入 DeepSeek Harness 的推理等级选择。
 
 运行时素材已包含在插件中，安装后不需要额外下载。当前接入 24 张经过审核的人像锚点，滑动时直接切换最近锚点，不做图片交叉渐变。

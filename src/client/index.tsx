@@ -24,7 +24,6 @@ import {
 const PACKAGE_ID = "dsh-client-liang-intensity-skin";
 const LOCALE_NAMESPACE = "liang.skin";
 const ASSET_PREFIX = `/plugins/${PACKAGE_ID}/assets`;
-const VIDEO_DURATION = 8.033;
 const BIND_EFFORT_KEY = "dsh-liang-intensity-skin.bind-effort";
 
 const PORTRAIT_ANCHORS = [
@@ -53,6 +52,8 @@ const PORTRAIT_ANCHORS = [
   { level: 29, file: "level-29.png" },
   { level: 30, file: "stage-30.png" },
 ] as const;
+
+const ANCHOR_LEVELS = PORTRAIT_ANCHORS.map((anchor) => anchor.level);
 
 interface SkinSettings {
   enabled: boolean;
@@ -139,7 +140,6 @@ class SkinPresenter {
   private readonly scope: PreferenceStore;
   private readonly theme: ThemeService;
   private readonly root: HTMLDivElement;
-  private readonly video: HTMLVideoElement;
   private readonly poster: HTMLImageElement;
   private readonly portrait: HTMLImageElement;
   private readonly preloads: HTMLImageElement[];
@@ -161,21 +161,6 @@ class SkinPresenter {
     this.root.dataset.media = "sequence";
     this.root.setAttribute("aria-hidden", "true");
 
-    this.video = document.createElement("video");
-    this.video.muted = true;
-    this.video.playsInline = true;
-    this.video.preload = "auto";
-    // A video poster stays painted while a paused video is scrubbed in some
-    // browsers, which would make every effort show the same portrait. Keep the
-    // separate image element as the true load-error fallback instead.
-    const webm = document.createElement("source");
-    webm.src = `${ASSET_PREFIX}/liang-evolution.webm`;
-    webm.type = "video/webm";
-    const mp4 = document.createElement("source");
-    mp4.src = `${ASSET_PREFIX}/liang-evolution.mp4`;
-    mp4.type = "video/mp4";
-    this.video.append(webm, mp4);
-
     this.poster = document.createElement("img");
     this.poster.className = "liang-skin-poster";
     this.poster.src = `${ASSET_PREFIX}/liang-poster.png`;
@@ -185,35 +170,26 @@ class SkinPresenter {
     this.portrait.className = "liang-skin-sequence-frame";
     this.portrait.alt = "";
     this.portrait.draggable = false;
+    this.portrait.decoding = "async";
     this.portrait.addEventListener("error", this.handleSequenceError);
 
     this.preloads = PORTRAIT_ANCHORS.map(({ file }) => {
       const image = new Image();
+      image.decoding = "async";
       image.src = `${ASSET_PREFIX}/portrait-source-v2/${file}`;
       return image;
     });
 
-    this.root.append(this.video, this.portrait, this.poster);
+    this.root.append(this.portrait, this.poster);
     document.body.prepend(this.root);
 
-    this.video.addEventListener("loadedmetadata", this.handleMetadata);
-    this.video.addEventListener("error", this.handleVideoError);
     this.poster.addEventListener("error", this.handlePosterError);
-    this.video.load();
     this.unsubscribe = scope.subscribe(() => this.syncSettings());
     this.syncSettings();
   }
 
-  private readonly handleMetadata = () => {
-    this.seek(this.frame);
-  };
-
-  private readonly handleVideoError = () => {
-    this.root.dataset.media = "poster";
-  };
-
   private readonly handleSequenceError = () => {
-    this.root.dataset.media = "video";
+    this.root.dataset.media = "poster";
   };
 
   private readonly handlePosterError = () => {
@@ -279,7 +255,6 @@ class SkinPresenter {
     body.style.setProperty("--liang-hover", palette.hover);
     body.style.setProperty("--liang-portrait-opacity", palette.portraitOpacity);
     this.updatePortrait(palette.level);
-    this.seek(this.frame);
   }
 
   syncNativeTheme(theme: NativeThemeId = paletteForFrame(this.frame).stage === 5 ? "dark" : "light") {
@@ -290,20 +265,13 @@ class SkinPresenter {
   private updatePortrait(level: number) {
     const { lowerIndex, upperIndex, mix } = portraitBlendForLevel(
       level,
-      PORTRAIT_ANCHORS.map((anchor) => anchor.level),
+      ANCHOR_LEVELS,
     );
     const lower = PORTRAIT_ANCHORS[lowerIndex];
     const upper = PORTRAIT_ANCHORS[upperIndex];
     const selected = mix >= 0.5 ? upper : lower;
     const source = `${ASSET_PREFIX}/portrait-source-v2/${selected.file}`;
     if (this.portrait.getAttribute("src") !== source) this.portrait.src = source;
-  }
-
-  private seek(frame: number) {
-    if (this.video.readyState < 1 || this.video.duration === 0) return;
-    const duration = Number.isFinite(this.video.duration) ? this.video.duration : VIDEO_DURATION;
-    const target = Math.min(Math.max(0, duration - 0.001), (frame / PREVIEW_MAX_FRAME) * duration);
-    if (Math.abs(this.video.currentTime - target) > 0.025) this.video.currentTime = target;
   }
 
   async choose(enabled: boolean) {
@@ -321,9 +289,6 @@ class SkinPresenter {
     this.disposed = true;
     this.unsubscribe();
     if (this.raf !== 0) cancelAnimationFrame(this.raf);
-    this.video.pause();
-    this.video.removeEventListener("loadedmetadata", this.handleMetadata);
-    this.video.removeEventListener("error", this.handleVideoError);
     this.portrait.removeEventListener("error", this.handleSequenceError);
     this.poster.removeEventListener("error", this.handlePosterError);
     for (const image of this.preloads) image.src = "";
