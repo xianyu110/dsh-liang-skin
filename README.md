@@ -2,9 +2,9 @@
 
 ## 安装
 
-##### 一、提示词安装：
+- #### 方法一， 提示词安装：
 <details>
-<summary>&emsp;&emsp;点击展开</summary>
+   <summary>&emsp;&emsp;点击展开提示词</summary>
 
 复制以下提示词给 DSH；会先排查冲突再安装，所以较长：
 
@@ -24,17 +24,14 @@ dsh plugin --profile web add 'github:kingOfSoySauce/dsh-liang-skin'
 
 </details>
 
-##### 二、或者[命令安装](#cli-install)；运行前请关闭其他皮肤插件，避免冲突
+-  #### 方法二(推荐)，安装[皮肤市场](https://github.com/kingOfSoySauce/dsh-skin-market#安装皮肤市场)插件后，搜索“滑动变祖”，一键安装
 
-##### 三、或者通过皮肤市场一键安装（推荐）
+-  #### 方法三， 或者[命令安装](#cli-install)；运行前请关闭其他皮肤插件，避免冲突
 
-打开 DSH 的「设置 → 皮肤市场」，搜索“滑动变祖”，点击“一键安装”，按提示重启 DSH Web 即可。尚未安装皮肤市场？请先按[安装说明](https://github.com/kingOfSoySauce/dsh-skin-market#安装皮肤市场)完成安装。
 
 ## 更多 DSH 皮肤
 
-想发现更多社区皮肤，欢迎[前往 DSH 皮肤市场](https://kingofsoysauce.github.io/dsh-skin-market/)浏览和一键安装。
-
-[安装皮肤市场或提交皮肤](https://github.com/kingOfSoySauce/dsh-skin-market)
+更多社区皮肤，点击[在线浏览皮肤市场](https://kingofsoysauce.github.io/dsh-skin-market/)
 
 ## 效果展示
 
@@ -43,17 +40,14 @@ dsh plugin --profile web add 'github:kingOfSoySauce/dsh-liang-skin'
     <td width="50%" align="center">
       <img src="docs/preview.png" alt="滑动变祖皮肤效果截图" width="100%">
       <br>
-      <sub>完整皮肤效果</sub>
     </td>
     <td width="50%" align="center">
       <img src="docs/demo.gif" alt="滑动变祖交互演示" width="100%">
       <br>
-      <sub>推理等级滑块演示</sub>
     </td>
   </tr>
 </table>
 
-把 Harness 的推理等级改为紧凑滑块，并用滑动变祖原项目的 0–30 强度映射同步人物、背景与界面配色。
 
 ## 交互规则
 
