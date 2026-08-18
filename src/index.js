@@ -9,8 +9,6 @@ export const SETTINGS_NAMESPACE = "liang-intensity-skin";
 export const ASSET_PREFIX = `/plugins/${PACKAGE_ID}/assets/`;
 
 const ASSET_SPECS = [
-  ["liang-cursor.cur", "image/x-icon"],
-  ["liang-cursor.ico", "image/x-icon"],
   ["liang-evolution.webm", "video/webm"],
   ["liang-evolution.mp4", "video/mp4"],
   ["liang-poster.png", "image/png"],

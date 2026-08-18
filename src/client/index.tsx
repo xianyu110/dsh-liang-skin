@@ -54,8 +54,6 @@ const PORTRAIT_ANCHORS = [
   { level: 30, file: "stage-30.png" },
 ] as const;
 
-const ANCHOR_LEVELS = PORTRAIT_ANCHORS.map((anchor) => anchor.level);
-
 interface SkinSettings {
   enabled: boolean;
   bindEffort: boolean;
@@ -143,16 +141,13 @@ class SkinPresenter {
   private readonly root: HTMLDivElement;
   private readonly video: HTMLVideoElement;
   private readonly poster: HTMLImageElement;
-  private readonly frames: HTMLImageElement[];
+  private readonly portrait: HTMLImageElement;
   private readonly preloads: HTMLImageElement[];
   private enabled = true;
   // Default to the max frame so the first paint after load is the dark shell;
   // starting at 0 flashed the light palette before the directory resolved.
   private frame = PREVIEW_MAX_FRAME;
   private pendingFrame = PREVIEW_MAX_FRAME;
-  private pendingMode: "drag" | "settle" = "settle";
-  private activeFrame = 0;
-  private pendingSource: string | null = null;
   private raf = 0;
   private disposed = false;
   private unsubscribe: () => void;
@@ -164,7 +159,6 @@ class SkinPresenter {
     this.root.className = "liang-skin-backdrop";
     this.root.dataset.plugin = PACKAGE_ID;
     this.root.dataset.media = "sequence";
-    this.root.dataset.crossfade = "slow";
     this.root.setAttribute("aria-hidden", "true");
 
     this.video = document.createElement("video");
@@ -173,7 +167,7 @@ class SkinPresenter {
     this.video.preload = "auto";
     // A video poster stays painted while a paused video is scrubbed in some
     // browsers, which would make every effort show the same portrait. Keep the
-    // separate image elements as the true load-error fallback instead.
+    // separate image element as the true load-error fallback instead.
     const webm = document.createElement("source");
     webm.src = `${ASSET_PREFIX}/liang-evolution.webm`;
     webm.type = "video/webm";
@@ -187,29 +181,19 @@ class SkinPresenter {
     this.poster.src = `${ASSET_PREFIX}/liang-poster.png`;
     this.poster.alt = "";
 
-    // Two stacked crossfade layers: the standby layer loads the next portrait
-    // while the active one stays painted, then an opacity/scale transition
-    // hands over — no hard src swap, no white flash.
-    this.frames = [];
-    for (let index = 0; index < 2; index += 1) {
-      const image = document.createElement("img");
-      image.className = "liang-skin-sequence-frame";
-      image.alt = "";
-      image.draggable = false;
-      image.decoding = "async";
-      image.addEventListener("error", this.handleSequenceError);
-      image.addEventListener("load", () => this.handleFrameLoaded(image));
-      this.frames.push(image);
-    }
+    this.portrait = document.createElement("img");
+    this.portrait.className = "liang-skin-sequence-frame";
+    this.portrait.alt = "";
+    this.portrait.draggable = false;
+    this.portrait.addEventListener("error", this.handleSequenceError);
 
     this.preloads = PORTRAIT_ANCHORS.map(({ file }) => {
       const image = new Image();
-      image.decoding = "async";
       image.src = `${ASSET_PREFIX}/portrait-source-v2/${file}`;
       return image;
     });
 
-    this.root.append(this.video, this.frames[0], this.frames[1], this.poster);
+    this.root.append(this.video, this.portrait, this.poster);
     document.body.prepend(this.root);
 
     this.video.addEventListener("loadedmetadata", this.handleMetadata);
@@ -262,10 +246,9 @@ class SkinPresenter {
     }
   }
 
-  setFrame(frame: number, mode: "drag" | "settle" = "drag") {
+  setFrame(frame: number) {
     this.pendingFrame = Math.min(PREVIEW_MAX_FRAME, Math.max(0, Math.round(frame)));
     this.frame = this.pendingFrame;
-    this.pendingMode = mode;
     if (!this.enabled) return;
     if (this.raf !== 0) return;
     this.raf = requestAnimationFrame(() => {
@@ -295,11 +278,8 @@ class SkinPresenter {
     body.style.setProperty("--liang-accent-hover", palette.accentHover);
     body.style.setProperty("--liang-hover", palette.hover);
     body.style.setProperty("--liang-portrait-opacity", palette.portraitOpacity);
-    this.root.dataset.crossfade = this.pendingMode === "settle" ? "slow" : "fast";
     this.updatePortrait(palette.level);
-    // Seeking a hidden <video> is pure cost (and visibly janky) during drags
-    // in the default image-sequence mode; only the video fallback needs it.
-    if (this.root.dataset.media === "video") this.seek(this.frame);
+    this.seek(this.frame);
   }
 
   syncNativeTheme(theme: NativeThemeId = paletteForFrame(this.frame).stage === 5 ? "dark" : "light") {
@@ -308,47 +288,15 @@ class SkinPresenter {
   }
 
   private updatePortrait(level: number) {
-    if (this.root.dataset.media !== "sequence") return;
     const { lowerIndex, upperIndex, mix } = portraitBlendForLevel(
       level,
-      ANCHOR_LEVELS,
+      PORTRAIT_ANCHORS.map((anchor) => anchor.level),
     );
     const lower = PORTRAIT_ANCHORS[lowerIndex];
     const upper = PORTRAIT_ANCHORS[upperIndex];
     const selected = mix >= 0.5 ? upper : lower;
     const source = `${ASSET_PREFIX}/portrait-source-v2/${selected.file}`;
-    const active = this.frames[this.activeFrame];
-    if (active.getAttribute("src") === source) {
-      // Already showing this anchor; drop any stale queued handover.
-      this.pendingSource = null;
-      return;
-    }
-    if (this.pendingSource === source) return;
-    const standbyIndex = 1 - this.activeFrame;
-    const standby = this.frames[standbyIndex];
-    this.pendingSource = source;
-    if (standby.getAttribute("src") !== source) standby.src = source;
-    // Cache hit (preloaded): hand over immediately — the CSS transition still
-    // eases the swap, so a fast drag stays glued to the pointer.
-    if (standby.complete && standby.naturalWidth > 0) {
-      this.activate(standbyIndex);
-    }
-  }
-
-  private readonly handleFrameLoaded = (image: HTMLImageElement) => {
-    if (
-      this.pendingSource === null
-      || image.getAttribute("src") !== this.pendingSource
-    ) return;
-    this.activate(this.frames.indexOf(image));
-  };
-
-  private activate(index: number) {
-    if (index < 0 || index === this.activeFrame) return;
-    this.frames[this.activeFrame].classList.remove("is-active");
-    this.activeFrame = index;
-    this.frames[index].classList.add("is-active");
-    this.pendingSource = null;
+    if (this.portrait.getAttribute("src") !== source) this.portrait.src = source;
   }
 
   private seek(frame: number) {
@@ -376,10 +324,7 @@ class SkinPresenter {
     this.video.pause();
     this.video.removeEventListener("loadedmetadata", this.handleMetadata);
     this.video.removeEventListener("error", this.handleVideoError);
-    for (const image of this.frames) {
-      image.removeEventListener("error", this.handleSequenceError);
-      image.src = "";
-    }
+    this.portrait.removeEventListener("error", this.handleSequenceError);
     this.poster.removeEventListener("error", this.handlePosterError);
     for (const image of this.preloads) image.src = "";
     this.root.remove();
@@ -431,13 +376,6 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
   const [interacting, setInteracting] = useState(false);
   const dragging = useRef(false);
   const dragStartFrame = useRef(frame);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const interactionArmed = useRef(false);
-  const dragStartCommittedId = useRef<string | undefined>(undefined);
-  const dragStartCurrent = useRef<ModelSelection | null>(null);
-  const previewSyncedId = useRef<string | undefined>(undefined);
-  const lockRaf = useRef(0);
-  const lockBaseLeft = useRef<number | null>(null);
   const enabled = skin.enabled;
 
   useEffect(() => {
@@ -447,43 +385,8 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
   useEffect(() => {
     if (!bindEffort || dragging.current || pending) return;
     setFrame(committedFrame);
-    presenter.setFrame(committedFrame, "settle");
+    presenter.setFrame(committedFrame);
   }, [bindEffort, committedFrame, pending, presenter]);
-
-  // While the user interacts (or a commit is in flight), the native model
-  // seat to the right may change its label width and reflow this flex row.
-  // Pin the control's on-screen position each frame and compensate any drift
-  // with a transform, then glide back smoothly when the interaction ends.
-  const locked = interacting || pending;
-  useEffect(() => {
-    if (!locked) return;
-    const root = rootRef.current;
-    if (root === null) return;
-    root.style.transition = "";
-    root.style.willChange = "transform";
-    lockBaseLeft.current = root.getBoundingClientRect().left;
-    const step = () => {
-      lockRaf.current = requestAnimationFrame(step);
-      const base = lockBaseLeft.current;
-      if (base === null) return;
-      const drift = base - root.getBoundingClientRect().left;
-      if (Math.abs(drift) > 0.5) {
-        root.style.transform = `translateX(${drift.toFixed(2)}px)`;
-      }
-    };
-    lockRaf.current = requestAnimationFrame(step);
-    return () => {
-      cancelAnimationFrame(lockRaf.current);
-      lockRaf.current = 0;
-      root.style.transition = "transform 200ms ease-out";
-      root.style.transform = "";
-      window.setTimeout(() => {
-        root.style.transition = "";
-        root.style.willChange = "";
-      }, 220);
-      lockBaseLeft.current = null;
-    };
-  }, [locked]);
 
   if (!enabled) return null;
   if (bindEffort && (reasoning === null || efforts.length < 2)) return null;
@@ -493,62 +396,21 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
   const progressRatio = frame / PREVIEW_MAX_FRAME;
   const tooltipLabel = indicatorLabel(frame, bindEffort ? efforts : []);
 
-  const beginInteraction = () => {
-    if (interactionArmed.current) return;
-    interactionArmed.current = true;
-    dragging.current = true;
-    dragStartFrame.current = frame;
-    const snapshot = directory.getSnapshot();
-    dragStartCurrent.current = snapshot.current;
-    const snapshotReasoning = modelReasoning(snapshot);
-    dragStartCommittedId.current = snapshotReasoning?.selection.reasoningEffort
-      ?? snapshotReasoning?.defaultEffort;
-    previewSyncedId.current = undefined;
-  };
-
-  // Roll the shared directory store back to the value captured before this
-  // interaction (undoes any optimistic preview echo).
-  const restorePreviewSync = () => {
-    const original = dragStartCurrent.current;
-    if (original === null || previewSyncedId.current === undefined) return;
-    directory.store.update((draft) => {
-      draft.current = original;
-    });
-    previewSyncedId.current = undefined;
-  };
-
-  const cancelInteraction = () => {
-    setInteracting(false);
-    interactionArmed.current = false;
-    dragging.current = false;
-    setFrame(dragStartFrame.current);
-    presenter.setFrame(dragStartFrame.current, "settle");
-    restorePreviewSync();
-  };
-
   const commit = async (rawFrame: number) => {
-    interactionArmed.current = false;
-    dragging.current = false;
     if (!bindEffort) {
+      dragging.current = false;
       setFrame(rawFrame);
-      presenter.setFrame(rawFrame, "settle");
+      presenter.setFrame(rawFrame);
       return;
     }
     const targetIndex = nearestEffortIndex(rawFrame, efforts);
     const target = efforts[targetIndex];
-    if (target === undefined) {
-      restorePreviewSync();
-      return;
-    }
+    if (target === undefined) return;
     const targetFrame = frameForEffort(targetIndex, efforts.length);
+    dragging.current = false;
     setFrame(targetFrame);
-    presenter.setFrame(targetFrame, "settle");
-    if (target.id === dragStartCommittedId.current) {
-      // No real change: just undo any optimistic preview echo.
-      restorePreviewSync();
-      return;
-    }
-    if (pending) return;
+    presenter.setFrame(targetFrame);
+    if (targetIndex === committedIndex || pending) return;
     setPending(true);
     setFailed(false);
     const accepted = await select({
@@ -559,25 +421,13 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
     setPending(false);
     if (!accepted) {
       setFailed(true);
-      restorePreviewSync();
-      const rollbackIndex = selectedEffortIndex(
-        efforts,
-        dragStartCommittedId.current,
-        undefined,
-      );
-      const rollbackFrame = rollbackIndex < 0
-        ? PREVIEW_MAX_FRAME
-        : frameForEffort(rollbackIndex, efforts.length);
-      setFrame(rollbackFrame);
-      presenter.setFrame(rollbackFrame, "settle");
-    } else {
-      previewSyncedId.current = undefined;
+      setFrame(committedFrame);
+      presenter.setFrame(committedFrame);
     }
   };
 
   return (
     <div
-      ref={rootRef}
       className="liang-effort-control"
       data-plugin={PACKAGE_ID}
       data-state={failed ? "error" : pending ? "pending" : "ready"}
@@ -611,38 +461,25 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
         aria-label={bindEffort ? "思考等级" : "皮肤进度"}
         aria-valuetext={bindEffort ? previewEffort?.name ?? "" : tooltipLabel}
         onPointerDown={() => {
-          beginInteraction();
+          dragging.current = true;
+          dragStartFrame.current = frame;
           setInteracting(true);
         }}
         onInput={(event) => {
           dragging.current = true;
           const next = Number(event.currentTarget.value);
           setFrame(next);
-          presenter.setFrame(next, "drag");
-          if (!bindEffort || reasoning === null) return;
-          // Optimistically echo the nearest preview effort into the shared
-          // directory store so the native model seat updates in lockstep
-          // while dragging; commit/rollback settles the final value.
-          const index = nearestEffortIndex(next, efforts);
-          const effort = efforts[index];
-          if (effort === undefined || effort.id === previewSyncedId.current) return;
-          previewSyncedId.current = effort.id;
-          directory.store.update((draft) => {
-            const current = draft.current;
-            if (
-              current === null
-              || current.provider !== reasoning.selection.provider
-              || current.model !== reasoning.selection.model
-            ) return;
-            current.reasoningEffort = effort.id;
-          });
+          presenter.setFrame(next);
         }}
         onPointerUp={(event) => {
           setInteracting(false);
           void commit(Number(event.currentTarget.value));
         }}
         onPointerCancel={() => {
-          cancelInteraction();
+          setInteracting(false);
+          dragging.current = false;
+          setFrame(dragStartFrame.current);
+          presenter.setFrame(dragStartFrame.current);
         }}
         onKeyUp={(event) => {
           setInteracting(false);
@@ -654,9 +491,11 @@ function LiangEffortSlider({ directory, load, select, presenter, scope }: Slider
         }}
         onKeyDown={(event) => {
           setInteracting(true);
-          beginInteraction();
           if (event.key === "Escape" && !pending) {
-            cancelInteraction();
+            setInteracting(false);
+            dragging.current = false;
+            setFrame(dragStartFrame.current);
+            presenter.setFrame(dragStartFrame.current);
           }
         }}
       />

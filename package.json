@@ -1,8 +1,8 @@
 {
   "name": "dsh-client-liang-intensity-skin",
-  "version": "0.2.0",
+  "version": "0.1.5",
   "private": true,
-  "description": "滑动变祖（社区优化版）：an opt-in adaptive reasoning slider skin for DeepSeek Harness",
+  "description": "滑动变祖：an opt-in adaptive reasoning slider skin for DeepSeek Harness",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kingOfSoySauce/dsh-liang-skin.git"
@@ -17,8 +17,6 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "assets/liang-cursor.cur",
-    "assets/liang-cursor.ico",
     "assets/liang-evolution.mp4",
     "assets/liang-evolution.webm",
     "assets/liang-poster.png",
@@ -46,7 +44,6 @@
     "assets/portrait-source-v2/level-28.png",
     "assets/portrait-source-v2/level-29.png",
     "assets/portrait-source-v2/stage-30.png",
-    "CHANGELOG.md",
     "cordis.patch.yml",
     "lib/client.js",
     "lib/client.js.map",

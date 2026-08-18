@@ -41,24 +41,7 @@ body[data-liang-skin="on"] .liang-skin-backdrop {
 
 .liang-skin-backdrop[data-media="sequence"] .liang-skin-sequence-frame {
   display: block;
-  /* Crossfade layers: inactive sits transparent and slightly enlarged, the
-     active one eases back to a calm 1:1. Dragging swaps fast so the preview
-     stays glued to the pointer; settling swaps slow for a gentle landing. */
-  opacity: 0;
-  transform: translateY(-50%) scale(1.018);
-  transition:
-    opacity 120ms ease-out,
-    transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
-}
-
-.liang-skin-backdrop[data-media="sequence"] .liang-skin-sequence-frame.is-active {
   opacity: var(--liang-portrait-opacity, 0.82);
-  transform: translateY(-50%) scale(1);
-}
-
-.liang-skin-backdrop[data-crossfade="slow"] .liang-skin-sequence-frame {
-  transition-duration: 340ms, 520ms;
 }
 
 .liang-skin-backdrop[data-media="video"] .liang-skin-sequence-frame,
@@ -354,14 +337,7 @@ body[data-liang-skin="on"]:is(
   --liang-control-rail: var(--dsw-alias-border-l3, rgb(0 0 0 / 16%));
   position: relative;
   display: flex;
-  /* Fixed footprint: the native model seat to the right changes its label
-     width when the reasoning effort changes, which reflows the trailing flex
-     row. Pin this control's own size so it never contributes to that shift
-     (absolute position is additionally locked during interaction in JS). */
-  flex: 0 0 124px;
   width: 124px;
-  min-width: 124px;
-  max-width: 124px;
   height: 28px;
   align-items: center;
   margin: 0 3px;
@@ -371,19 +347,6 @@ body[data-liang-skin="on"]:is(
 body[data-liang-skin="on"] .liang-effort-control {
   --liang-control-accent: var(--liang-secondary);
   --liang-control-rail: color-mix(in srgb, var(--liang-secondary) 28%, transparent);
-}
-
-/* The native model seat (composer input.model) widens with the effort label
-   text; give it a stable footprint under the Liang skin so switching effort
-   never reflows the slider out of position. The label ellipsizes instead.
-   Button-scoped on purpose: the inner label/effort spans also contain this
-   class substring and must never be sized (sizing them pushed the effort text
-   out of the button, splitting the model+effort pair apart). */
-body[data-liang-skin="on"] button[class*="_7KE1Ra_trigger"] {
-  box-sizing: border-box;
-  width: 180px;
-  min-width: 180px;
-  max-width: 180px;
 }
 
 .liang-effort-control__ticks {
@@ -452,9 +415,7 @@ body[data-liang-skin="on"] button[class*="_7KE1Ra_trigger"] {
   width: calc(100% - 7px);
   height: 28px;
   margin: 0 3.5px;
-  /* Branded pointer (centered hotspot baked into the .cur); fall back to the
-     native resize cursor if the asset fails to load. */
-  cursor: url("/plugins/dsh-client-liang-intensity-skin/assets/liang-cursor.cur") 16 16, ew-resize;
+  cursor: ew-resize;
   appearance: none;
   background: transparent;
   touch-action: pan-y;
@@ -659,10 +620,7 @@ body[data-liang-skin="on"] .liang-effort-control__range::-webkit-slider-thumb {
 
 @media (max-width: 760px) {
   .liang-effort-control {
-    flex-basis: 92px;
     width: 92px;
-    min-width: 92px;
-    max-width: 92px;
   }
 
   .liang-skin-backdrop video,
@@ -678,7 +636,6 @@ body[data-liang-skin="on"] .liang-effort-control__range::-webkit-slider-thumb {
   .liang-skin-backdrop,
   .liang-skin-backdrop video,
   .liang-skin-backdrop img,
-  .liang-skin-backdrop .liang-skin-sequence-frame,
   body[data-liang-skin="on"] button,
   body[data-liang-skin="on"] input,
   body[data-liang-skin="on"] textarea {
